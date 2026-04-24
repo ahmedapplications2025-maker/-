@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | نظام الحماية</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #070b12;
+      --surface: #0d1420;
+      --surface2: #111b2d;
+      --border: #1a2840;
+      --accent: #00c8ff;
+      --accent2: #e63946;
+      --accent-dim: rgba(0,200,255,0.1);
+      --green: #00ff9d;
+      --green-dim: rgba(0,255,157,0.1);
+      --text: #d4e6ff;
+      --muted: #4a6080;
+      --warn: #ffb347;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 56px 1fr;
+      overflow-x: hidden;
+    }
+
+    /* Scan line effect */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,200,255,0.015) 2px, rgba(0,200,255,0.015) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: logoBlink 3s ease-in-out infinite;
+    }
+
+    @keyframes logoBlink {
+      0%, 90%, 100% { opacity: 1; }
+      95% { opacity: 0.1; }
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hbadge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      border: 1px solid;
+    }
+
+    .hbadge.offline { border-color: var(--muted); color: var(--muted); }
+    .hbadge.online { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+    .hbadge.streaming { border-color: var(--accent2); color: var(--accent2); background: rgba(230,57,70,0.1); animation: stream-blink 1.2s ease-in-out infinite; }
+
+    @keyframes stream-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .time-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ---- MAIN LAYOUT ---- */
+    main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 0;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+    }
+
+    /* ---- SIDEBAR ---- */
+    .sidebar {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      padding: 20px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Status tiles */
+    .tile {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .tile-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .tile-row:last-child { margin-bottom: 0; }
+
+    .tile-label {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .indicator {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: all 0.4s ease;
+    }
+
+    .indicator.on { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .indicator.warn { background: var(--warn); box-shadow: 0 0 6px var(--warn); animation: blink 1s infinite; }
+    .indicator.red { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); animation: blink 0.8s infinite; }
+
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+
+    .tile-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Camera face toggle */
+    .face-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .face-opt {
+      padding: 10px 8px;
+      border-radius: 9px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Cairo', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .face-opt.active {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #00a8d4, #00c8ff);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0,200,255,0.3);
+    }
+
+    .btn-start:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,200,255,0.45); }
+    .btn-start:active { transform: translateY(0); }
+    .btn-start:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-stop {
+      background: var(--surface2);
+      color: var(--accent2);
+      border: 1.5px solid var(--accent2);
+    }
+
+    .btn-stop:hover { background: rgba(230,57,70,0.1); }
+    .btn-stop:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* Log */
+    .log-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.9;
+      max-height: 160px;
+      overflow-y: auto;
+      direction: rtl;
+    }
+
+    .log-box .ok { color: var(--green); }
+    .log-box .warn { color: var(--accent2); }
+    .log-box .info { color: var(--accent); }
+
+    .log-entry { animation: fadeUp 0.3s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---- MAIN VIEW ---- */
+    .main-view {
+      display: flex;
+      flex-direction: column;
+      background: #040810;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Video container */
+    .video-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Corner marks */
+    .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.5;
+      z-index: 2;
+    }
+
+    .corner.tl { top: 16px; right: 16px; border-width: 2px 0 0 2px; border-radius: 0; }
+    .corner.tr { top: 16px; left: 16px; border-width: 2px 2px 0 0; }
+    .corner.bl { bottom: 16px; right: 16px; border-width: 0 0 2px 2px; }
+    .corner.br { bottom: 16px; left: 16px; border-width: 0 2px 2px 0; }
+
+    #remoteVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    #remoteVideo.visible { display: block; }
+
+    /* Placeholder */
+    .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--muted);
+    }
+
+    .placeholder svg {
+      width: 64px;
+      height: 64px;
+      opacity: 0.3;
+    }
+
+    .placeholder p {
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+    }
+
+    /* Grid overlay on active */
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Bottom bar */
+    .bottom-bar {
+      height: 44px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .bottom-bar span { display: flex; align-items: center; gap: 6px; }
+
+    /* REC badge */
+    .rec-badge {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      background: rgba(230,57,70,0.15);
+      border: 1px solid var(--accent2);
+      border-radius: 20px;
+      padding: 3px 10px;
+      color: var(--accent2);
+      font-size: 11px;
+      animation: stream-blink 1s infinite;
+    }
+
+    .rec-badge.visible { display: flex; }
+
+    .rec-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      main { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+      .main-view { order: -1; min-height: 260px; }
+      .sidebar { max-height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-dot"></div>
+      RIYADH · SECURITY
+    </div>
+    <div class="header-status">
+      <span class="hbadge offline" id="deviceBadge">الجهاز غير متصل</span>
+      <span class="hbadge offline" id="streamBadge">لا يوجد بث</span>
+    </div>
+    <div class="time-display" id="clockEl">00:00:00</div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- SIDEBAR: Controls -->
+    <aside class="sidebar">
+
+      <div>
+        <div class="section-title">حالة الجهاز</div>
+        <div class="tile">
+          <div class="tile-row">
+            <span class="tile-label"><span class="indicator" id="i_device"></span> الجهاز</span>
+            <span class="tile-value" id="v_device">غير متصل</span>
+          </div>
+          <div class="tile-row">
+            <span class="tile-label"><span class="indicator" id="i_camera"></span> الكاميرا</span>
+            <span class="tile-value" id="v_camera">متوقفة</span>
+          </div>
+          <div class="tile-row">
+            <span class="tile-label"><span class="indicator" id="i_conn"></span> الاتصال</span>
+            <span class="tile-value" id="v_conn">منقطع</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">الكاميرا</div>
+        <div class="tile">
+          <p class="tile-label" style="margin-bottom:10px">اختر الكاميرا</p>
+          <div class="face-group">
+            <button class="face-opt active" id="fo_front" onclick="selectFace('user')">📱 أمامية</button>
+            <button class="face-opt" id="fo_back" onclick="selectFace('environment')">📷 خلفية</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">التحكم</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-start" id="btnStart" onclick="sendStart()">▶ تشغيل الكاميرا</button>
+          <button class="btn btn-stop" id="btnStop" onclick="sendStop()" disabled>■ إيقاف الكاميرا</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">سجل الأحداث</div>
+        <div class="log-box" id="logBox"></div>
+      </div>
+
+    </aside>
+
+    <!-- MAIN VIEW: Video feed -->
+    <section class="main-view">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="grid-overlay"></div>
+
+      <div class="video-wrapper">
+        <div class="placeholder" id="placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
+            <line x1="7" y1="2" x2="7" y2="22"/>
+            <line x1="17" y1="2" x2="17" y2="22"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <line x1="2" y1="7" x2="7" y2="7"/>
+            <line x1="2" y1="17" x2="7" y2="17"/>
+            <line x1="17" y1="17" x2="22" y2="17"/>
+            <line x1="17" y1="7" x2="22" y2="7"/>
+          </svg>
+          <p>في انتظار البث المباشر...</p>
+        </div>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+
+      <div class="bottom-bar">
+        <span>
+          <span class="rec-badge" id="recBadge"><span class="rec-dot"></span> LIVE</span>
+        </span>
+        <span id="statusBar">جاهز للمراقبة</span>
+        <span id="resInfo">—</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // ===== CONFIG =====
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "create-61c4f.firebaseapp.com",
+      databaseURL: "https://create-61c4f-default-rtdb.firebaseio.com",
+      projectId: "create-61c4f",
+      storageBucket: "create-61c4f.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ==================
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let pc = null;
+    let selectedFace = 'user';
+    let streaming = false;
+
+    // ---- Clock ----
+    const clockEl = document.getElementById('clockEl');
+    setInterval(() => {
+      clockEl.textContent = new Date().toLocaleTimeString('ar-EG', { hour12: false });
+    }, 1000);
+
+    // ---- Logging ----
+    const logBox = document.getElementById('logBox');
+    function log(msg, type = '') {
+      const t = new Date().toLocaleTimeString('ar-EG');
+      logBox.innerHTML = `<div class="log-entry ${type}">[${t}] ${msg}</div>` + logBox.innerHTML;
+    }
+
+    // ---- UI helpers ----
+    function setIndicator(id, cls, val) {
+      document.getElementById('i_' + id).className = 'indicator ' + cls;
+      document.getElementById('v_' + id).textContent = val;
+    }
+
+    function setStreamUI(on) {
+      streaming = on;
+      const rv = document.getElementById('remoteVideo');
+      const ph = document.getElementById('placeholder');
+      const rec = document.getElementById('recBadge');
+      const sb = document.getElementById('streamBadge');
+      const db2 = document.getElementById('deviceBadge');
+
+      rv.classList.toggle('visible', on);
+      ph.style.display = on ? 'none' : 'flex';
+      rec.classList.toggle('visible', on);
+      sb.textContent = on ? '● بث مباشر' : 'لا يوجد بث';
+      sb.className = on ? 'hbadge streaming' : 'hbadge offline';
+
+      document.getElementById('btnStart').disabled = on;
+      document.getElementById('btnStop').disabled = !on;
+      setIndicator('camera', on ? 'red' : '', on ? 'تعمل 🔴' : 'متوقفة');
+      setIndicator('conn', on ? 'on' : '', on ? 'متصل' : 'منقطع');
+      document.getElementById('statusBar').textContent = on ? 'بث مباشر نشط' : 'جاهز للمراقبة';
+    }
+
+    // ---- Face selector ----
+    window.selectFace = function(face) {
+      selectedFace = face;
+      document.getElementById('fo_front').classList.toggle('active', face === 'user');
+      document.getElementById('fo_back').classList.toggle('active', face === 'environment');
+    };
+
+    // ---- Send commands ----
+    window.sendStart = async function() {
+      document.getElementById('btnStart').disabled = true;
+      await set(ref(db, 'camera/command'), { action: 'start', face: selectedFace, ts: serverTimestamp() });
+      log('▶ تم إرسال أمر التشغيل', 'info');
+    };
+
+    window.sendStop = async function() {
+      await set(ref(db, 'camera/command'), { action: 'stop', ts: serverTimestamp() });
+      await set(ref(db, 'webrtc/offer'), null);
+      await set(ref(db, 'webrtc/answer'), null);
+      await set(ref(db, 'webrtc/ice_camera'), null);
+      await set(ref(db, 'webrtc/ice_admin'), null);
+      if (pc) { pc.close(); pc = null; }
+      setStreamUI(false);
+      log('⏹ تم إرسال أمر الإيقاف', 'warn');
+    };
+
+    // ---- WebRTC: accept offer from camera ----
+    onValue(ref(db, 'webrtc/offer'), async snap => {
+      if (!snap.val()) return;
+      const offer = snap.val();
+      if (pc) { pc.close(); pc = null; }
+
+      log('📡 تم استلام العرض من الكاميرا', 'info');
+
+      pc = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      });
+
+      pc.ontrack = e => {
+        const rv = document.getElementById('remoteVideo');
+        if (rv.srcObject !== e.streams[0]) {
+          rv.srcObject = e.streams[0];
+          setStreamUI(true);
+          log('✅ بث الكاميرا يعمل', 'ok');
+          // Show resolution
+          const track = e.streams[0].getVideoTracks()[0];
+          if (track) {
+            const s = track.getSettings();
+            if (s.width && s.height) {
+              document.getElementById('resInfo').textContent = `${s.width}×${s.height}`;
+            }
+          }
+        }
+      };
+
+      // Collect ICE
+      const iceCandidates = [];
+      pc.onicecandidate = e => {
+        if (e.candidate) iceCandidates.push(e.candidate.toJSON());
+      };
+
+      pc.onicegatheringstatechange = async () => {
+        if (pc.iceGatheringState === 'complete') {
+          await set(ref(db, 'webrtc/ice_admin'), iceCandidates);
+        }
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        const s = pc.iceConnectionState;
+        if (s === 'disconnected' || s === 'failed' || s === 'closed') {
+          setStreamUI(false);
+          log('⚠ انقطع الاتصال: ' + s, 'warn');
+        }
+      };
+
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await set(ref(db, 'webrtc/answer'), { sdp: answer.sdp, type: answer.type });
+      log('📨 تم إرسال الرد للكاميرا', 'info');
+
+      // Add camera ICE
+      onValue(ref(db, 'webrtc/ice_camera'), async snap2 => {
+        if (!snap2.val() || !pc) return;
+        for (const c of snap2.val()) {
+          try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch(e) {}
+        }
+      });
+    });
+
+    // ---- Watch device status ----
+    onValue(ref(db, 'camera/device'), snap => {
+      const d = snap.val();
+      const on = d && d.online;
+      const db2 = document.getElementById('deviceBadge');
+      db2.textContent = on ? 'الجهاز متصل' : 'الجهاز غير متصل';
+      db2.className = on ? 'hbadge online' : 'hbadge offline';
+      setIndicator('device', on ? 'on' : '', on ? 'متصل ✓' : 'غير متصل');
+      if (on) log('📲 الجهاز أصبح متصلاً', 'ok');
+    });
+
+    // ---- Watch camera status ----
+    onValue(ref(db, 'camera/status'), snap => {
+      const s = snap.val();
+      if (!s) return;
+      if (!s.active) {
+        setStreamUI(false);
+        log('⏹ الكاميرا توقفت على الجهاز');
+      }
+    });
+
+    log('🔌 لوحة التحكم جاهزة', 'info');
+    setIndicator('device', '', 'جاري الفحص...');
+    setIndicator('camera', '', 'متوقفة');
+    setIndicator('conn', '', 'منقطع');
+  </script>
+</body>
+</html>
