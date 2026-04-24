@@ -33,7 +33,6 @@
       position: relative;
     }
 
-    /* Subtle noise texture */
     body::before {
       content: '';
       position: fixed;
@@ -52,32 +51,21 @@
       width: 100%;
     }
 
-    /* Camera Icon SVG */
     .camera-icon {
-      width: 90px;
-      height: 90px;
+      width: 90px; height: 90px;
       margin: 0 auto 28px;
       position: relative;
     }
 
-    .camera-icon svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Pulsing ring */
     .ring {
       position: absolute;
       inset: -12px;
       border-radius: 50%;
       border: 2px solid var(--accent);
       opacity: 0;
-      animation: none;
     }
 
-    .ring.active {
-      animation: pulse-ring 2s ease-out infinite;
-    }
+    .ring.active { animation: pulse-ring 2s ease-out infinite; }
 
     @keyframes pulse-ring {
       0% { transform: scale(0.85); opacity: 0.6; }
@@ -85,8 +73,7 @@
     }
 
     .icon-circle {
-      width: 90px;
-      height: 90px;
+      width: 90px; height: 90px;
       border-radius: 50%;
       background: var(--accent-dim);
       border: 1.5px solid var(--accent);
@@ -95,28 +82,36 @@
       justify-content: center;
     }
 
-    h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-    }
+    h1 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
 
     .subtitle {
       font-size: 13px;
       color: var(--muted);
       line-height: 1.8;
-      margin-bottom: 36px;
+      margin-bottom: 28px;
     }
 
-    /* Status card */
+    .device-id-badge {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+      font-family: monospace;
+      direction: ltr;
+    }
+
+    .device-id-badge span { color: var(--accent); }
+
     .status-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .status-row {
@@ -135,69 +130,41 @@
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       background: var(--muted);
       flex-shrink: 0;
-      transition: all 0.4s ease;
     }
 
     .dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green); }
     .dot.active-cam { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: blink 1s ease-in-out infinite; }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
 
-    .status-value {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-    }
+    .status-value { font-size: 13px; font-weight: 600; color: var(--text); }
 
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 16px 0;
-    }
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
 
-    /* Camera face selector */
-    .face-btns {
+    .admin-btn {
       display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 10px;
-      margin-top: 20px;
-    }
-
-    .face-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-family: 'Cairo', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .face-btn.selected {
-      border-color: var(--accent);
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--accent);
       background: var(--accent-dim);
       color: var(--text);
+      font-family: 'Cairo', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
     }
 
-    /* Hidden video element - camera streams here but not shown to user */
-    #localVideo {
-      display: none !important;
-      position: fixed;
-      top: -9999px;
-      left: -9999px;
-    }
+    .admin-btn:active { opacity: 0.8; }
 
-    /* Footer */
     .footer {
       position: fixed;
       bottom: 24px;
@@ -208,37 +175,7 @@
       z-index: 1;
     }
 
-    .footer span {
-      color: var(--accent);
-    }
-
-    /* Log */
-    .log {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 12px;
-      color: var(--muted);
-      text-align: right;
-      line-height: 2;
-      max-height: 120px;
-      overflow-y: auto;
-    }
-
-    .log-entry { animation: fadeIn 0.3s ease; }
-    .log-entry.warn { color: var(--accent); }
-    .log-entry.ok { color: var(--green); }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .footer span { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -248,7 +185,7 @@
     <div class="camera-icon">
       <div class="ring" id="ring"></div>
       <div class="icon-circle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#e63946" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e63946" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40">
           <path d="M23 7l-7 5 7 5V7z"/>
           <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
         </svg>
@@ -260,6 +197,8 @@
       هذا الجهاز مرتبط بنظام المراقبة<br>
       الكاميرا تعمل عند صدور أمر من لوحة التحكم
     </p>
+
+    <div class="device-id-badge">DEVICE ID: <span id="deviceIdLabel">...</span></div>
 
     <div class="status-card">
       <div class="status-row">
@@ -278,28 +217,19 @@
       </div>
     </div>
 
-    <div class="face-btns">
-      <button class="face-btn selected" id="btnFront" onclick="setFace('user')">📱 أمامية</button>
-      <button class="face-btn" id="btnBack" onclick="setFace('environment')">📷 خلفية</button>
-    </div>
-
-    <div style="height:16px"></div>
-    <div class="log" id="log"></div>
+    <a class="admin-btn" href="admin.html" target="_blank">🖥 فتح لوحة التحكم</a>
 
   </div>
 
   <div class="footer">نظام الأمان · <span>RIYADH</span> · حماية متكاملة</div>
 
-  <!-- Hidden video - NOT shown to user -->
-  <video id="localVideo" autoplay playsinline muted></video>
+  <video id="localVideo" style="display:none;position:fixed;top:-9999px;left:-9999px;" autoplay playsinline muted></video>
 
-  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, serverTimestamp }
+    import { getDatabase, ref, onValue, set, remove, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // ===== CONFIG — نفس مشروعك =====
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "create-61c4f.firebaseapp.com",
@@ -309,164 +239,123 @@
       messagingSenderId: "YOUR_SENDER_ID",
       appId: "YOUR_APP_ID"
     };
-    // ================================
 
     const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    const db  = getDatabase(app);
 
-    // ---- WebRTC ----
+    // ── ID فريد لكل جهاز، يثبت طول الجلسة ──
+    let DEVICE_ID = sessionStorage.getItem('cam_device_id');
+    if (!DEVICE_ID) {
+      DEVICE_ID = 'cam_' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      sessionStorage.setItem('cam_device_id', DEVICE_ID);
+    }
+    document.getElementById('deviceIdLabel').textContent = DEVICE_ID;
+
+    // مسارات خاصة بهذا الجهاز فقط
+    const camBase = `cameras/${DEVICE_ID}`;
+    const rtcBase = `webrtc/${DEVICE_ID}`;
+
     let pc = null;
     let localStream = null;
-    let currentFace = 'user'; // default front
+    let currentFace = 'user';
 
-    const ring = document.getElementById('ring');
-    const connDot = document.getElementById('connDot');
-    const camDot = document.getElementById('camDot');
-    const connStatus = document.getElementById('connStatus');
-    const camStatus = document.getElementById('camStatus');
+    const ring         = document.getElementById('ring');
+    const connDot      = document.getElementById('connDot');
+    const camDot       = document.getElementById('camDot');
+    const connStatus   = document.getElementById('connStatus');
+    const camStatus    = document.getElementById('camStatus');
     const camFaceLabel = document.getElementById('camFaceLabel');
-    const logEl = document.getElementById('log');
-    const localVideo = document.getElementById('localVideo');
+    const localVideo   = document.getElementById('localVideo');
 
-    function log(msg, type = '') {
-      const d = new Date().toLocaleTimeString('ar-EG');
-      logEl.innerHTML = `<div class="log-entry ${type}">[${d}] ${msg}</div>` + logEl.innerHTML;
-    }
-
-    window.setFace = function(face) {
-      currentFace = face;
-      document.getElementById('btnFront').classList.toggle('selected', face === 'user');
-      document.getElementById('btnBack').classList.toggle('selected', face === 'environment');
-      // If camera already on, restart with new face
-      if (localStream) {
-        stopCamera().then(() => startCamera());
-      }
-      log(face === 'user' ? 'تم اختيار الكاميرا الأمامية' : 'تم اختيار الكاميرا الخلفية');
-    };
-
-    async function startCamera() {
+    async function startCamera(face) {
       try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: currentFace },
-          audio: false
-        });
+        localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: face }, audio: false });
         localVideo.srcObject = localStream;
         camDot.className = 'dot active-cam';
         camStatus.textContent = 'تعمل الآن 🔴';
-        camFaceLabel.textContent = currentFace === 'user' ? 'أمامية' : 'خلفية';
+        camFaceLabel.textContent = face === 'user' ? 'أمامية' : 'خلفية';
         ring.classList.add('active');
-        log('✅ تم تشغيل الكاميرا', 'ok');
-        await set(ref(db, 'camera/status'), { active: true, face: currentFace, ts: serverTimestamp() });
+        await set(ref(db, `${camBase}/status`), { active: true, face, ts: serverTimestamp() });
         return localStream;
       } catch (e) {
-        log('❌ فشل تشغيل الكاميرا: ' + e.message, 'warn');
+        camStatus.textContent = 'فشل التشغيل';
+        console.error('Camera error:', e);
       }
     }
 
     async function stopCamera() {
-      if (localStream) {
-        localStream.getTracks().forEach(t => t.stop());
-        localStream = null;
-        localVideo.srcObject = null;
-      }
-      if (pc) {
-        pc.close();
-        pc = null;
-      }
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+      localVideo.srcObject = null;
+      if (pc) { pc.close(); pc = null; }
       camDot.className = 'dot';
       camStatus.textContent = 'متوقفة';
       camFaceLabel.textContent = '—';
       ring.classList.remove('active');
-      log('⏹ الكاميرا متوقفة');
-      await set(ref(db, 'camera/status'), { active: false, ts: serverTimestamp() });
-      await set(ref(db, 'webrtc/offer'), null);
-      await set(ref(db, 'webrtc/answer'), null);
-      await set(ref(db, 'webrtc/ice_camera'), null);
+      await set(ref(db, `${camBase}/status`), { active: false, ts: serverTimestamp() });
+      await remove(ref(db, `${rtcBase}/offer`));
+      await remove(ref(db, `${rtcBase}/answer`));
+      await remove(ref(db, `${rtcBase}/ice_camera`));
     }
 
-    // ---- WebRTC signaling ----
     async function createOffer() {
       if (pc) { pc.close(); pc = null; }
-
-      const stream = localStream || await startCamera();
+      const stream = localStream || await startCamera(currentFace);
       if (!stream) return;
 
-      pc = new RTCPeerConnection({
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-      });
-
+      pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
       stream.getTracks().forEach(t => pc.addTrack(t, stream));
 
-      // Collect ICE candidates
       const iceCandidates = [];
-      pc.onicecandidate = e => {
-        if (e.candidate) iceCandidates.push(e.candidate.toJSON());
-      };
-
+      pc.onicecandidate = e => { if (e.candidate) iceCandidates.push(e.candidate.toJSON()); };
       pc.onicegatheringstatechange = async () => {
-        if (pc.iceGatheringState === 'complete') {
-          await set(ref(db, 'webrtc/ice_camera'), iceCandidates);
-        }
+        if (pc.iceGatheringState === 'complete')
+          await set(ref(db, `${rtcBase}/ice_camera`), iceCandidates);
+      };
+      pc.oniceconnectionstatechange = () => {
+        if (['disconnected','failed','closed'].includes(pc.iceConnectionState)) stopCamera();
       };
 
       const offer = await pc.createOffer({ offerToReceiveVideo: false });
       await pc.setLocalDescription(offer);
-      await set(ref(db, 'webrtc/offer'), { sdp: offer.sdp, type: offer.type });
-      log('📡 تم إرسال العرض للوحة التحكم', 'ok');
+      await set(ref(db, `${rtcBase}/offer`), { sdp: offer.sdp, type: offer.type });
 
-      // Listen for answer
-      onValue(ref(db, 'webrtc/answer'), async snap => {
+      onValue(ref(db, `${rtcBase}/answer`), async snap => {
         if (!snap.val() || !pc) return;
-        const ans = snap.val();
-        if (pc.signalingState === 'have-local-offer') {
-          await pc.setRemoteDescription(new RTCSessionDescription(ans));
-          log('🔗 تم الاتصال بلوحة التحكم', 'ok');
-        }
+        if (pc.signalingState === 'have-local-offer')
+          await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
       });
 
-      // Listen for admin ICE
-      onValue(ref(db, 'webrtc/ice_admin'), async snap => {
+      onValue(ref(db, `${rtcBase}/ice_admin`), async snap => {
         if (!snap.val() || !pc) return;
-        for (const c of snap.val()) {
-          try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch(e) {}
-        }
+        for (const c of snap.val()) try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch(e) {}
       });
     }
 
-    // ---- Main command listener ----
-    connDot.className = 'dot';
-    connStatus.textContent = 'جاري الاتصال...';
-
-    const cmdRef = ref(db, 'camera/command');
-    onValue(cmdRef, async snap => {
+    // ── استمع فقط للأوامر الموجهة لهذا الجهاز ──
+    onValue(ref(db, `${camBase}/command`), async snap => {
       connDot.className = 'dot connected';
       connStatus.textContent = 'متصل ✓';
-
       const cmd = snap.val();
       if (!cmd) return;
-
       if (cmd.action === 'start') {
-        if (cmd.face) currentFace = cmd.face;
-        document.getElementById('btnFront').classList.toggle('selected', currentFace === 'user');
-        document.getElementById('btnBack').classList.toggle('selected', currentFace === 'environment');
-        if (!localStream) await startCamera();
+        currentFace = cmd.face || currentFace;
+        if (!localStream) await startCamera(currentFace);
         await createOffer();
-        log('▶️ أمر التشغيل من لوحة التحكم', 'ok');
       } else if (cmd.action === 'stop') {
         await stopCamera();
-        log('⏹ أمر الإيقاف من لوحة التحكم', 'warn');
       }
-    }, err => {
-      connStatus.textContent = 'خطأ في الاتصال';
-      log('❌ خطأ Firebase: ' + err.message, 'warn');
+    }, () => { connStatus.textContent = 'خطأ في الاتصال'; });
+
+    // سجّل الجهاز متصل
+    set(ref(db, `${camBase}/info`), {
+      online: true,
+      id: DEVICE_ID,
+      ua: navigator.userAgent.slice(0, 80),
+      ts: serverTimestamp()
     });
 
-    // Mark device online
-    set(ref(db, 'camera/device'), { online: true, ts: serverTimestamp() });
-    log('📲 الجهاز متصل وجاهز');
-
     window.addEventListener('beforeunload', () => {
-      set(ref(db, 'camera/device'), { online: false });
+      set(ref(db, `${camBase}/info`), { online: false, id: DEVICE_ID });
     });
   </script>
 </body>
